@@ -66,6 +66,7 @@ const AddComponent = (props: Props) => {
             value="Normal"
             checked={priority === "Normal"}
             onClick={() => setPriority("Normal")}
+            style={{ backgroundColor: "green" }}
           />
           <label className="form-check-label">Normal</label>
         </div>
@@ -78,6 +79,7 @@ const AddComponent = (props: Props) => {
             value="Important"
             checked={priority === "Important"}
             onClick={() => setPriority("Important")}
+            style={{ backgroundColor: "orange" }}
           />
           <label className="form-check-label">Important</label>
         </div>
@@ -90,6 +92,7 @@ const AddComponent = (props: Props) => {
             value="Very Important"
             checked={priority === "Very Important"}
             onClick={() => setPriority("Very Important")}
+            style={{ backgroundColor: "red" }}
           />
           <label className="form-check-label">Very Important</label>
         </div>

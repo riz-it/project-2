@@ -42,8 +42,14 @@ const RegisterContainer: React.FC<ContainerProps> = () => {
       const createUserName = async () => {};
     } catch (err) {
       if (err instanceof Error) {
-        setRegistError(err.message);
         console.log(err.message);
+        if (/auth\/invalid-email/.test(err.message)) {
+          setRegistError("Email tidak valid.");
+        } else if (/auth\/weak-password/.test(err.message)) {
+          setRegistError("Kata sandi harus 6 karakter.");
+        } else {
+          setRegistError(err.message);
+        }
       }
     }
   };

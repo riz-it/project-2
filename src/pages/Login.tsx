@@ -17,6 +17,7 @@ import { useEffect } from "react";
 const Login: React.FC = () => {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
   const history = useHistory();
 
   const loginApp = () => {
@@ -27,6 +28,11 @@ const Login: React.FC = () => {
       })
       .catch((err) => {
         console.log(err.message);
+        if (/auth\/invalid-email/.test(err.message)) {
+          setLoginError("Akun tidak ditemukan.");
+        } else {
+          setLoginError(err.message);
+        }
       });
   };
 
@@ -38,6 +44,7 @@ const Login: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        {loginError && <div className="alert alert-danger">{loginError}</div>}
         <IonInput
           placeholder="Username"
           onIonChange={(e) => {
