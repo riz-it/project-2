@@ -3,39 +3,69 @@ import { auth, db } from "../config/firebase";
 import { useHistory } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
+  doc,
   collection,
+  query,
+  where,
   getDocs,
-  addDoc,
-  updateDoc,
   deleteDoc,
 } from "firebase/firestore";
 import AddComponent from "../components/AddComponent";
 
 const Dashboard: React.FC = () => {
   const history = useHistory();
-  const usersCollectionRef = collection(db, "users");
-
   const tasksCollectionRef = collection(db, "tasks");
-  const [tasks, setTasks] = useState({});
+  const [tasks, setTasks] = useState([]);
+  const [filter, setFilter] = useState("Normal");
+  const [dataFromParent, setDataFromParent] = useState({});
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (!user) {
         history.push("/login");
       } else {
+        // action else
       }
     });
 
-    const getTasks = async () => {
-      const data = await getDocs(tasksCollectionRef);
-      setTasks(data.docs.map((taskdocument) => ({ ...taskdocument.data() })));
-    };
-
     getTasks();
-  });
+  }, []);
+
   const logout = async () => {
     await signOut(auth);
     history.push("/login");
   };
+
+  const getTasks = async () => {
+    const data: any = await getDocs(tasksCollectionRef);
+    setTasks(data.docs);
+  };
+
+  const setTaskCondition = (isUpdate: boolean) => {
+    if (isUpdate) setDataFromParent({});
+    getTasks();
+  };
+
+  const onDelete = async (item: any, index: number) => {
+    const docRef = doc(db, "tasks", item.id);
+    await deleteDoc(docRef);
+    setTasks(prev => {
+      const newData = [...prev];
+      newData.splice(index, 1);
+      return newData;
+    });
+  };
+
+  const onUpdate = (item: any, index: number) => {
+    setDataFromParent({ id: item.id, data: item.data() });
+  };
+
+  const onFilter = async () => {
+    const q = query(tasksCollectionRef, where("priority", "==", filter));
+    const data: any = await getDocs(q);
+    setTasks(data.docs);
+  };
+
   return (
     <div>
       <div className="row">
@@ -63,32 +93,37 @@ const Dashboard: React.FC = () => {
         <div className="col">
           <div className="card m-3 bg-light">
             <div className="card-body">
-              <AddComponent />
+              <AddComponent dataFromParent={dataFromParent} setTasks={isUpdate => setTaskCondition(isUpdate)} />
             </div>
           </div>
         </div>
         <div className="col">
           <div className="card m-3 bg-light">
             <div className="card-body">
-              <form className="row g-3">
+              <div className="row">
                 <div className="col-auto">
                   <select
                     className="form-select"
                     aria-label="Default select example"
+                    defaultValue={filter}
+                    onChange={e => setFilter(e.target.value)}
                   >
-                    <option selected value="1">
+                    <option value="Normal">
                       Normal
                     </option>
-                    <option value="2">Important</option>
-                    <option value="2">Very Important</option>
+                    <option value="Important">Important</option>
+                    <option value="Very Important">Very Important</option>
                   </select>
                 </div>
                 <div className="col-auto">
-                  <button type="submit" className="btn btn-dark mb-3">
+                  <button type="submit" className="btn btn-dark mb-3" style={{ marginRight: 8 }} onClick={onFilter}>
                     Filter
                   </button>
+                  <button type="submit" className="btn btn-danger mb-3" onClick={() => getTasks()}>
+                    Reset
+                  </button>
                 </div>
-              </form>
+              </div>
               <table className="table table-dark table-striped">
                 <thead>
                   <tr>
@@ -99,25 +134,32 @@ const Dashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row">Penting</th>
-                    <td>Tugas 1</td>
-                    <td>Progres</td>
-                    <td>
-                      <button
-                        type="button"
-                        className="btn mx-1 btn-sm btn-danger"
-                      >
-                        Danger
-                      </button>
-                      <button
-                        type="button"
-                        className="btn mx-1 btn-sm btn-warning"
-                      >
-                        Warning
-                      </button>
-                    </td>
-                  </tr>
+                  {tasks.map((item: any, index: number) => {
+                    const row = item.data()
+                    return (
+                      <tr key={index}>
+                        <th scope="row">{row.priority}</th>
+                        <td>{row.task}</td>
+                        <td>{row.status}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="btn mx-1 btn-sm btn-danger"
+                            onClick={() => onDelete(item, index)}
+                          >
+                            Hapus
+                          </button>
+                          <button
+                            type="button"
+                            className="btn mx-1 btn-sm btn-primary"
+                            onClick={() => onUpdate(item, index)}
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
