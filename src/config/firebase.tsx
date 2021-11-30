@@ -5,13 +5,12 @@ import { getAuth } from "firebase/auth";
 import "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBqRGoUEo3rVNqFzhC7t6trL1_JyURwxNs",
-  authDomain: "todolist-46c38.firebaseapp.com",
-  projectId: "todolist-46c38",
-  storageBucket: "todolist-46c38.appspot.com",
-  messagingSenderId: "20271953633",
-  appId: "1:20271953633:web:43b3c00f3f569e6737a9a0",
-  measurementId: "G-B5YJ7WCTPE",
+  apiKey: "AIzaSyBqXDaOiB8t4x8Sr_sftjIOzTvHMv4zQLw",
+  authDomain: "todolistrizalids.firebaseapp.com",
+  projectId: "todolistrizalids",
+  storageBucket: "todolistrizalids.appspot.com",
+  messagingSenderId: "152595017457",
+  appId: "1:152595017457:web:1095892d9afcf2ffe88350"
 };
 
 // Initialize Firebase
